@@ -5,11 +5,16 @@ import json
 from flask_cors import CORS
 
 from .database.models import db_drop_and_create_all, setup_db, Drink
-from .auth.auth import AuthError, requires_auth
+from .auth.auth import AuthError, requires_auth, get_token_auth_header
 
 app = Flask(__name__)
 setup_db(app)
 CORS(app)
+
+class AuthError(Exception):
+    def __init__(self, error, status_code):
+        self.error = error
+        self.status_code = status_code
 
 '''
 @TODO uncomment the following line to initialize the datbase
@@ -19,6 +24,7 @@ CORS(app)
 # db_drop_and_create_all()
 
 ## ROUTES
+
 '''
 @TODO implement endpoint
     GET /drinks
@@ -28,7 +34,6 @@ CORS(app)
         or appropriate status code indicating reason for failure
 '''
 
-
 '''
 @TODO implement endpoint
     GET /drinks-detail
@@ -37,7 +42,10 @@ CORS(app)
     returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
         or appropriate status code indicating reason for failure
 '''
-
+# @app.route('/drinks-detail', methods=['GET'])
+# @requires_auth('get:drinks-detail')
+# def drinks_details(payload):
+#     return 'got the drinks'
 
 '''
 @TODO implement endpoint
@@ -108,3 +116,10 @@ def unprocessable(error):
 @TODO implement error handler for AuthError
     error handler should conform to general task above 
 '''
+@app.errorhandler(AuthError)
+def auth_error(error):
+    return jsonify({
+        "success": False,
+        "error": error.status_code,
+        "message": error.error
+        })
