@@ -67,7 +67,7 @@ def check_permissions(permission, payload):
     if 'permissions' not in payload:
         raise AuthError('No permissions provided', 400)
     if permission not in payload['permissions']:
-        raise AuthError('Now allowed in permission', 401)
+        raise AuthError('Not allowed in permission', 401)
 
     return True
 
